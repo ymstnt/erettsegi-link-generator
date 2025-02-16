@@ -1,0 +1,142 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<script src="../scripts/erettsegi.ts"></script>
+
+<Layout
+  title="Érettségi"
+  description="Hasznos eszközök a magyar érettségihez"
+  nav="/"
+>
+  <section id="generator">
+    <div id="generator-container" class="container">
+      <h1>Érettségi link generátor</h1>
+      <hr />
+      <form action="">
+        <label for="year">Év:</label>
+        <select name="year" class="dropdown" id="year"></select>
+        <label for="period">Időszak:</label>
+        <select name="period" class="dropdown" id="period">
+          <option value="majus">május-június</option>
+          <option value="oktober" id="oktober">október-november</option>
+        </select>
+        <label for="difficulty">Nehézségi szint:</label>
+        <select name="difficulty" class="dropdown" id="difficulty">
+          <option value="kozep">középszint</option>
+          <option value="emelt">emelt szint</option>
+        </select>
+        <label for="subject">Tantárgy:</label>
+        <select name="subject" class="dropdown" id="subject">
+          <option value="magyir" id="magyir">Magyar nyelv és irodalom</option>
+          <option value="mat" id="mat">Matematika</option>
+          <option value="tort" id="tort">Történelem</option>
+          <option value="angol" id="angol">Angol nyelv</option>
+          <option value="inf" id="inf">Informatika (közismereti)</option>
+          <option value="infoism" id="infoism"
+            >Informatikai ismeretek (ágazati)</option
+          >
+          <option value="digkult" id="digkult"
+            >Digitális kultúra</option
+          >
+        </select>
+        <br />
+        <input type="url" name="output" id="output" disabled />
+        <br />
+        <input type="button" value="Feladatlap" class="btn" id="task" />
+        <input
+          type="button"
+          value="Forrásfájlok"
+          class="btn"
+          id="sourcefiles"
+        />
+        <input type="button" value="Javítókulcs" class="btn" id="solution" />
+        <input
+          type="button"
+          value="Megoldás fájlok"
+          class="btn"
+          id="solutionfiles"
+        />
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  body {
+    overflow-wrap: break-word;
+  }
+
+  section {
+    margin: 0 auto;
+    padding: 1em;
+  }
+
+  #generator {
+    background-color: var(--mantle);
+  }
+
+  .container {
+    margin: 0 var(--horizontal-margin);
+  }
+
+  #countdown {
+    color: #4cba51;
+  }
+
+  #generator-container > h1 {
+    margin-bottom: 0;
+  }
+
+  .small {
+    font-size: 0.9em;
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 2em;
+  }
+
+  #output {
+    margin-top: 1em;
+    width: 100%;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  form {
+    margin: 1em auto;
+  }
+
+  @media (max-width: 1506px) {
+    body {
+      font-size: 1em;
+    }
+
+    main {
+      padding: 1.5em;
+    }
+
+    .container {
+      margin: 0 1em;
+    }
+
+    #érettségi-section {
+      padding-bottom: 1em;
+    }
+
+    #countdown-intro {
+      font-size: 1.5em;
+    }
+
+    #countdown {
+      font-size: 1.5em;
+    }
+
+    #generator-container > h1 {
+      font-size: 1.5em;
+    }
+  }
+</style>
