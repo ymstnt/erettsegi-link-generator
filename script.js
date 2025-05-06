@@ -23,7 +23,7 @@ function formUpdate(pressedButtonId) {
   let { year, period, subject, difficulty } = getFormValues();
 
   updateFileInputs(subject);
-  period = handleSpecialCases(year, period);
+  ({ period, subject } = handleSpecialCases(year, period, subject));
   const fixedSubject = fixSubjectByYear(subject, year);
 
   const { fileType, itFileType } = getFileTypes(pressedButtonId, year);
@@ -63,9 +63,8 @@ function updateFileInputs(subject) {
   document.querySelector("#solutionfiles").disabled = !enable;
 }
 
-function handleSpecialCases(year, period) {
+function handleSpecialCases(year, period, subject) {
   const y = parseInt(year);
-  let newPeriod = period; // Default "new" period to current period
 
   // Disable october (fall) if the current year has not passed it, set "new" period
   if (y === dateTime.getUTCFullYear() && !checkAvailableMonths().fall) {
@@ -73,7 +72,7 @@ function handleSpecialCases(year, period) {
     if (period === "october") {
       document.querySelector("#may").checked = true;
       document.querySelector("#october").checked = false;
-      newPeriod = "may";
+      period = "may";
     }
   } else {
     // Enable october (fall) if the current year has passed it
@@ -81,11 +80,20 @@ function handleSpecialCases(year, period) {
   }
 
   // Hide specific subjects depending on the year
-  toggleElementVisibility("#infoism", y < 2017);
-  toggleElementVisibility("#digkult", y < 2022);
-  toggleElementVisibility("#inf", y > 2023);
+  toggleElementVisibility("#infoism", y < 2017); // Ágazati informatika didn't exist before 2017
+  if (y < 2017) {
+    subject = switchSubjectWhenDisabled("infoism", "inf", subject);
+  }
+  toggleElementVisibility("#digkult", y < 2022); // Digitális kultúra didn't exist before 2022, after 2023 közismereti informatika was removed
+  if (y < 2022) {
+    subject = switchSubjectWhenDisabled("digkult", "inf", subject);
+  }
+  toggleElementVisibility("#inf", y > 2023); // After 2023, közismereti informatika no longer exists
+  if (y > 2023) {
+    subject = switchSubjectWhenDisabled("inf", "digkult", subject);
+  }
 
-  return newPeriod; // return the "new" period -> this only changes if the current year has not passed october (fall) yet
+  return { period, subject }; // return the "new" period -> this only changes if the current year has not passed october (fall) yet
 }
 
 // IT subjects were called differently in specific years, handle that here
@@ -201,18 +209,12 @@ function toggleRadioEnabled(element, enable) {
 }
 
 // Switch from selected subject if disabled
-function switchSubjectWhenDisabled(
-  subjectToCheck,
-  subjectToSwitchTo,
-  subject,
-  generatedSubject
-) {
+function switchSubjectWhenDisabled(subjectToCheck, subjectToSwitchTo, subject) {
   if (subject === subjectToCheck) {
     document.querySelector("#subject").value = subjectToSwitchTo;
     subject = subjectToSwitchTo;
-    generatedSubject = subjectToSwitchTo;
   }
-  return { subject, generatedSubject };
+  return subject;
 }
 
 // Check if the current year has passed may (spring) and october (fall)
