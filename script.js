@@ -1,5 +1,5 @@
 let generatedLink;
-let dateTime = new Date("2023-07-30");
+let dateTime = new Date();
 const finalExamForm = document.getElementById("final-exam-form");
 
 // Dynamically fill year selector with years
