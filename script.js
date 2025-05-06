@@ -23,6 +23,11 @@ formUpdate();
 function formUpdate(pressedButtonId) {
   let { year, period, subject, difficulty } = getFormValues();
 
+  if (period == undefined || difficulty == undefined) {
+    selectRadiosIfNoneIsSelected(period, difficulty);
+    formUpdate();
+  }
+
   updateFileInputs(subject);
   ({ period, subject } = handleSpecialCases(year, period, subject));
   const fixedSubject = fixSubjectByYear(subject, year);
@@ -231,4 +236,14 @@ function checkAvailableMonths() {
 function scrollOutputToEnd() {
   const output = document.querySelector("#output");
   output.scrollLeft = output.scrollWidth;
+}
+
+function selectRadiosIfNoneIsSelected(period, difficulty) {
+  if (period == undefined) {
+    document.querySelector("#may").checked = true;
+  }
+
+  if (difficulty == undefined) {
+    document.querySelector("#middle").checked = true;
+  }
 }
