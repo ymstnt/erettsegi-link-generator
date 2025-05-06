@@ -1,8 +1,8 @@
 let generatedLink;
-let pressedButton;
-let dateTime = new Date();
+let dateTime = new Date("2023-07-30");
 const finalExamForm = document.getElementById("final-exam-form");
 
+// Dynamically fill year selector with years
 function fillFormWithYears() {
   let currentYear = dateTime.getUTCFullYear();
   if (!checkAvailableMonths().spring) {
@@ -18,170 +18,31 @@ function fillFormWithYears() {
 fillFormWithYears();
 formUpdate();
 
-function formUpdate() {
-  console.log("Form updated");
+// Update the output url and link
+function formUpdate(pressedButtonId) {
+  let { year, period, subject, difficulty } = getFormValues();
 
-  let year = finalExamForm.querySelector("#year").value;
-  let period = finalExamForm.querySelector(
-    'input[name="period"]:checked'
-  )?.value;
-  let difficulty = finalExamForm.querySelector(
-    'input[name="difficulty"]:checked'
-  )?.value;
-  let subject = finalExamForm.querySelector("#subject").value;
+  updateFileInputs(subject);
+  period = handleSpecialCases(year, period);
+  const fixedSubject = fixSubjectByYear(subject, year);
 
-  let generatedPeriod;
-  let periodMonth;
-  let generatedDifficulty;
-  let generatedSubject;
-  let generatedFileType;
-  let itFileType;
+  const { fileType, itFileType } = getFileTypes(pressedButtonId, year);
 
-  if (period === "may") {
-    generatedPeriod = "tavasz";
-    periodMonth = "maj";
-  } else {
-    generatedPeriod = "osz";
-    periodMonth = "okt";
-  }
-
-  if (subject === "inf" || subject === "infoism" || subject === "digkult") {
-    document.querySelector("#sourcefiles").disabled = false;
-    document.querySelector("#solutionfiles").disabled = false;
-  } else {
-    document.querySelector("#sourcefiles").disabled = true;
-    document.querySelector("#solutionfiles").disabled = true;
-  }
-
-  let convertedYear = parseInt(year);
-
-  if (
-    convertedYear === dateTime.getUTCFullYear() &&
-    !checkAvailableMonths().fall
-  ) {
-    toggleElementVisibility("#october", true);
-    if (period === "october") {
-      document.querySelector("#period").value = "may";
-      period = "may";
-      generatedPeriod = "tavasz";
-    }
-  } else {
-    toggleElementVisibility("#october", false);
-  }
-
-  if (convertedYear < 2017) {
-    toggleElementVisibility("#infoism", true);
-    ({ subject, generatedSubject } = switchSubjectWhenDisabled(
-      "infoism",
-      "inf",
-      subject,
-      generatedSubject
-    ));
-  } else {
-    toggleElementVisibility("#infoism", false);
-  }
-
-  if (convertedYear < 2022) {
-    toggleElementVisibility("#digkult", true);
-    ({ subject, generatedSubject } = switchSubjectWhenDisabled(
-      "digkult",
-      "inf",
-      subject,
-      generatedSubject
-    ));
-  } else {
-    toggleElementVisibility("#digkult", false);
-  }
-
-  if (convertedYear > 2023) {
-    toggleElementVisibility("#inf", true);
-    ({ subject, generatedSubject } = switchSubjectWhenDisabled(
-      "inf",
-      "digkult",
-      subject,
-      generatedSubject
-    ));
-  } else {
-    toggleElementVisibility("#inf", false);
-  }
-
-  if (
-    subject === "inf" &&
-    convertedYear <= 2011 &&
-    !(convertedYear === 2011 && period === "oktober")
-  ) {
-    generatedSubject = "info";
-  } else {
-    generatedSubject = subject;
-  }
-
-  let linkPrefix =
-    "https://www.oktatas.hu/bin/content/dload/erettsegi/feladatok";
-
-  switch (pressedButton) {
-    case "task":
-      generatedFileType = "fl.pdf";
-      itFileType = "";
-      break;
-    case "sourcefiles":
-      itFileType =
-        convertedYear >= 2005 && convertedYear <= 2008 ? "forras" : "for";
-      generatedFileType = "fl.zip";
-      break;
-    case "solution":
-      generatedFileType = "ut.pdf";
-      itFileType = "";
-      break;
-    case "solutionfiles":
-      itFileType =
-        convertedYear >= 2005 && convertedYear <= 2008 ? "megoldas" : "meg";
-      generatedFileType = "ut.zip";
-      break;
-    default:
-      generatedFileType = "fl.pdf";
-      itFileType = "";
-      break;
-  }
-
-  if (convertedYear > 2012) {
-    linkPrefix += "_";
-  }
-
-  if (difficulty === "middle") {
-    generatedDifficulty = "kozep";
-  } else if (difficulty === "advanced") {
-    generatedDifficulty = "emelt";
-  }
-
-  let assembledPart;
-
-  if (convertedYear === 2005 && period === "may") {
-    assembledPart = `${year}${generatedPeriod}/${generatedDifficulty}/${generatedDifficulty.charAt(
-      0
-    )}_${generatedSubject}${itFileType}_${generatedFileType}`;
-  } else if (
-    convertedYear >= 2005 &&
-    convertedYear <= 2012 &&
-    !(convertedYear === 2005 && period === "may") &&
-    !(convertedYear === 2012 && period === "october")
-  ) {
-    assembledPart = `${year}${generatedPeriod}/${generatedDifficulty}/${generatedDifficulty.charAt(
-      0
-    )}_${generatedSubject}${itFileType}_${year.slice(
-      -2
-    )}${periodMonth}_${generatedFileType}`;
-  } else {
-    assembledPart = `${year}${generatedPeriod}_${generatedDifficulty}/${generatedDifficulty.charAt(
-      0
-    )}_${generatedSubject}${itFileType}_${year.slice(
-      -2
-    )}${periodMonth}_${generatedFileType}`;
-  }
-
-  generatedLink = linkPrefix + assembledPart;
+  console.log(
+    `Form updated: Year: ${year}\nPeriod: ${period}\nSubject: ${subject}\nSubject (fixed): ${fixedSubject}\nDifficulty: ${difficulty}\nFile type: ${fileType}\nIT subject file type: ${itFileType}`
+  );
+  generatedLink = generateLink(
+    year,
+    period,
+    fixedSubject,
+    difficulty,
+    fileType,
+    itFileType
+  );
   document.querySelector("#output").value = generatedLink;
 }
 
+// Gets the currently selected values from form inputs
 function getFormValues() {
   const year = finalExamForm.querySelector("#year").value;
   const period = finalExamForm.querySelector(
@@ -195,6 +56,7 @@ function getFormValues() {
   return { year, period, difficulty, subject };
 }
 
+// Enables source files and solution files buttons when IT subjects are selected, disables them otherwise
 function updateFileInputs(subject) {
   const enable = ["inf", "infoism", "digkult"].includes(subject);
   document.querySelector("#sourcefiles").disabled = !enable;
@@ -203,21 +65,30 @@ function updateFileInputs(subject) {
 
 function handleSpecialCases(year, period) {
   const y = parseInt(year);
+  let newPeriod = period; // Default "new" period to current period
 
+  // Disable october (fall) if the current year has not passed it, set "new" period
   if (y === dateTime.getUTCFullYear() && !checkAvailableMonths().fall) {
-    toggleElementVisibility("#october", true);
+    toggleRadioEnabled("#october", false);
     if (period === "october") {
-      document.querySelector("#period").value = "may";
+      document.querySelector("#may").checked = true;
+      document.querySelector("#october").checked = false;
+      newPeriod = "may";
     }
   } else {
-    toggleElementVisibility("#october", false);
+    // Enable october (fall) if the current year has passed it
+    toggleRadioEnabled("#october", true);
   }
 
+  // Hide specific subjects depending on the year
   toggleElementVisibility("#infoism", y < 2017);
   toggleElementVisibility("#digkult", y < 2022);
   toggleElementVisibility("#inf", y > 2023);
+
+  return newPeriod; // return the "new" period -> this only changes if the current year has not passed october (fall) yet
 }
 
+// IT subjects were called differently in specific years, handle that here
 function fixSubjectByYear(subject, year) {
   const y = parseInt(year);
   if (y < 2017 && subject === "infoism") return "inf";
@@ -228,11 +99,12 @@ function fixSubjectByYear(subject, year) {
   return subject;
 }
 
-function getFileTypes(year, period) {
+// Get the file type depending on which button was cliked on
+function getFileTypes(pressedButtonId, year) {
   const y = parseInt(year);
   let fileType, itFileType;
 
-  switch (pressedButton) {
+  switch (pressedButtonId) {
     case "task":
       fileType = "fl.pdf";
       itFileType = "";
@@ -257,20 +129,25 @@ function getFileTypes(year, period) {
   return { fileType, itFileType };
 }
 
+// Finally, after getting all data, generate the new download link
 function generateLink(year, period, subject, difficulty, fileType, itFileType) {
-  let prefix = "https://www.oktatas.hu/bin/content/dload/erettsegi/feladatok";
+  let prefix = "https://www.oktatas.hu/bin/content/dload/erettsegi/feladatok"; // Prefix is always the same
   const y = parseInt(year);
-  if (y > 2012) prefix += "_";
+  if (y > 2012) prefix += "_"; // ... except before 2012 for some reason
 
+  // Convert form values to link parts
   const generatedPeriod = period === "may" ? "tavasz" : "osz";
   const month = period === "may" ? "maj" : "okt";
   const level = difficulty === "middle" ? "kozep" : "emelt";
   const last2 = year.slice(-2);
 
+  // Generate the final part of the link consisting of the year, period, difficulty level, difficulty level's first char, subject, (IT subject file type) and file type
   let part;
   if (y === 2005 && period === "may") {
+    // Format for 2005 may (spring)
     part = `${year}${generatedPeriod}/${level}/${level[0]}_${subject}${itFileType}_${fileType}`;
   } else if (
+    // Format between 2005 october (fall) and 2012 may (spring)
     y >= 2005 &&
     y <= 2012 &&
     !(y === 2005 && period === "may") &&
@@ -278,12 +155,14 @@ function generateLink(year, period, subject, difficulty, fileType, itFileType) {
   ) {
     part = `${year}${generatedPeriod}/${level}/${level[0]}_${subject}${itFileType}_${last2}${month}_${fileType}`;
   } else {
+    // Format now
     part = `${year}${generatedPeriod}_${level}/${level[0]}_${subject}${itFileType}_${last2}${month}_${fileType}`;
   }
 
   return prefix + part;
 }
 
+// Put event listener to all selects and radio buttons -> trigger formUpdate
 const inputElements = Array.from(
   finalExamForm.getElementsByClassName("input-element")
 );
@@ -291,16 +170,17 @@ inputElements.forEach((element) => {
   element.addEventListener("change", formUpdate);
 });
 
+// Put event listener on all buttons -> trigger formUpdate and pass button id
 const buttons = Array.from(finalExamForm.getElementsByClassName("btn"));
 buttons.forEach((btn) => {
   btn.addEventListener("click", (e) => {
     let element = e.target;
-    pressedButton = element.id;
-    formUpdate();
+    formUpdate(element.id);
     window.open(generatedLink, "_blank");
   });
 });
 
+// Element hiding toggle
 function toggleElementVisibility(element, hide) {
   let el = document.querySelector(element);
   if (hide) {
@@ -310,6 +190,17 @@ function toggleElementVisibility(element, hide) {
   }
 }
 
+// Radio button disable toggle
+function toggleRadioEnabled(element, enable) {
+  let el = document.querySelector(element);
+  if (enable) {
+    el.disabled = false;
+  } else {
+    el.disabled = true;
+  }
+}
+
+// Switch from selected subject if disabled
 function switchSubjectWhenDisabled(
   subjectToCheck,
   subjectToSwitchTo,
@@ -324,6 +215,7 @@ function switchSubjectWhenDisabled(
   return { subject, generatedSubject };
 }
 
+// Check if the current year has passed may (spring) and october (fall)
 function checkAvailableMonths() {
   let currentMonth = dateTime.getUTCMonth();
 
