@@ -16,6 +16,7 @@ function fillFormWithYears() {
 }
 
 fillFormWithYears();
+scrollOutputToEnd();
 formUpdate();
 
 // Update the output url and link
@@ -225,4 +226,9 @@ function checkAvailableMonths() {
   let fall = currentMonth > 10;
 
   return { spring, fall };
+}
+
+function scrollOutputToEnd() {
+  const output = document.querySelector("#output");
+  output.scrollLeft = output.scrollWidth;
 }
