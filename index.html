@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Érettségi link generátor</title>
+  </head>
+  <body>
+    <div id="generator-container" class="container">
+      <h1>Érettségi link generátor</h1>
+      <hr />
+      <form id="final-exam-form" action="">
+        <div class="input-group">
+          <label for="year">Év:</label>
+          <select name="year" class="input-element" id="year"></select>
+        </div>
+        <div class="input-group">
+          <p>Időszak:</p>
+          <input
+            type="radio"
+            name="period"
+            class="input-element"
+            id="may"
+            value="may"
+          />
+          <label for="may">május-június</label>
+          <input
+            type="radio"
+            name="period"
+            class="input-element"
+            id="october"
+            value="october"
+          />
+          <label for="october">október-november</label>
+        </div>
+        <div class="input-group">
+          <p>Nehézségi szint:</p>
+          <input
+            type="radio"
+            name="difficulty"
+            class="input-element"
+            id="middle"
+            value="middle"
+          />
+          <label for="middle">középszint</label>
+          <input
+            type="radio"
+            name="difficulty"
+            class="input-element"
+            id="advanced"
+            value="advanced"
+          />
+          <label for="advanced">emelt szint</label>
+        </div>
+        <div class="input-group">
+          <p>Tantárgy:</p>
+          <select name="subject" class="input-element" id="subject">
+            <option value="magyir" id="magyir">Magyar nyelv és irodalom</option>
+            <option value="mat" id="mat">Matematika</option>
+            <option value="tort" id="tort">Történelem</option>
+            <option value="angol" id="angol">Angol nyelv</option>
+            <option value="inf" id="inf">Informatika (közismereti)</option>
+            <option value="infoism" id="infoism">
+              Informatikai ismeretek (ágazati)
+            </option>
+            <option value="digkult" id="digkult">Digitális kultúra</option>
+          </select>
+        </div>
+        <br />
+        <input type="url" name="output" id="output" disabled />
+        <br />
+        <input type="button" value="Feladatlap" class="btn" id="task" />
+        <input
+          type="button"
+          value="Forrásfájlok"
+          class="btn"
+          id="sourcefiles"
+        />
+        <input type="button" value="Javítókulcs" class="btn" id="solution" />
+        <input
+          type="button"
+          value="Megoldás fájlok"
+          class="btn"
+          id="solutionfiles"
+        />
+      </form>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
