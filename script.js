@@ -184,9 +184,9 @@ buttons.forEach((btn) => {
 function toggleElementVisibility(element, hide) {
   let el = document.querySelector(element);
   if (hide) {
-    el.classList.add("hidden");
+    el.style.display = "none";
   } else {
-    el.classList.remove("hidden");
+    el.style.display = "";
   }
 }
 
