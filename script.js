@@ -32,7 +32,7 @@ function formUpdate(pressedButtonId) {
   ({ period, subject } = handleSpecialCases(year, period, subject));
   const fixedSubject = fixSubjectByYear(subject, year);
 
-  const { fileType, itFileType } = getFileTypes(pressedButtonId, year);
+  const { fileType, itFileType } = getFileTypes(pressedButtonId, year, subject);
 
   console.log(
     `Form updated: Year: ${year}\nPeriod: ${period}\nSubject: ${subject}\nSubject (fixed): ${fixedSubject}\nDifficulty: ${difficulty}\nFile type: ${fileType}\nIT subject file type: ${itFileType}`
@@ -67,6 +67,9 @@ function updateFileInputs(subject) {
   const enable = ["inf", "infoism", "digkult"].includes(subject);
   document.querySelector("#sourcefiles").disabled = !enable;
   document.querySelector("#solutionfiles").disabled = !enable;
+  if (subject === "angol") {
+    document.querySelector("#sourcefiles").disabled = false;
+  }
 }
 
 function handleSpecialCases(year, period, subject) {
@@ -115,7 +118,7 @@ function fixSubjectByYear(subject, year) {
 }
 
 // Get the file type depending on which button was cliked on
-function getFileTypes(pressedButtonId, year) {
+function getFileTypes(pressedButtonId, year, subject) {
   const y = parseInt(year);
   let fileType, itFileType;
 
@@ -125,8 +128,13 @@ function getFileTypes(pressedButtonId, year) {
       itFileType = "";
       break;
     case "sourcefiles":
-      itFileType = y >= 2005 && y <= 2008 ? "forras" : "for";
-      fileType = "fl.zip";
+      if (subject == "angol") {
+        fileType = "fl.mp3";
+        itFileType = "";
+      } else {
+        itFileType = y >= 2005 && y <= 2008 ? "forras" : "for";
+        fileType = "fl.zip";
+      }
       break;
     case "solution":
       fileType = "ut.pdf";
