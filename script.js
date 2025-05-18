@@ -102,12 +102,13 @@ function handleSpecialCases(year, period, subject) {
   return { period, subject }; // return the "new" period -> this only changes if the current year has not passed october (fall) yet
 }
 
-// IT subjects were called differently in specific years, handle that here
+// Some subjects were called differently in specific years, handle that here
 function fixSubjectByYear(subject, year) {
   const y = parseInt(year);
   if (y < 2017 && subject === "infoism") return "inf";
   if (y < 2022 && subject === "digkult") return "inf";
   if (y > 2023 && subject === "inf") return "digkult";
+  if (y < 2009 && subject === "kem") return "kemia";
   if (subject === "inf" && y <= 2011 && !(y === 2011 && period === "oktober"))
     return "info";
   return subject;
